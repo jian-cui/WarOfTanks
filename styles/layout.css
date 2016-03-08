@@ -1,0 +1,13 @@
+#map {
+	text-align: center
+}
+
+#canvas {
+    background: #000;
+    /*float: left;*/
+    display: inline;
+    border: 1px solid red;
+}
+#none {
+	display: none;
+}
