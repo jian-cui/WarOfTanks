@@ -29,14 +29,14 @@ var tankSize = {
 var tankPicsNPC = {
     'top': [9, 27],
     'bottom': [81, 99],
-    'left': [45, 63],
-    'right': [117, 135]
+    'left': [117, 135],
+    'right': [45, 63]
 };
 var tankPicsP1 = {
     'top': [1, 19],
     'bottom': [73, 91],
-    'left': [37, 55],
-    'right': [109, 127]
+    'left': [109, 127],
+    'right': [37, 55]
 };
 var tankPicsP2 = {
     'top': [5, 23],
@@ -78,7 +78,6 @@ function drawCanvas(status, y) {
         case 1:
             //添加动态坦克
             if (game.mode === 0) {
-                console.log("0");
                 ctx.clearRect(150, 305, 32, 32);
                 if (boolTankAni) {
                     ctx.drawImage(elemTank, 1152, 0, 32, 32, 150, 275, 32, 32);
@@ -88,7 +87,6 @@ function drawCanvas(status, y) {
                     boolTankAni = true;
                 }
             } else if (game.mode === 1) {
-                console.log(1);
                 ctx.clearRect(150, 275, 32, 32);
                 if (boolTankAni) {
                     ctx.drawImage(elemTank, 1152, 0, 32, 32, 150, 305, 32, 32);
@@ -101,7 +99,6 @@ function drawCanvas(status, y) {
             break;
         case 2:
             //选中以后关闭所有画面
-            console.log("status2");
             if (pageCurtain.x < game.w / 2) {
                 ctx.fillStyle = "grey";
                 ctx.fillRect(0, 0, pageCurtain.x, game.h);
@@ -115,31 +112,6 @@ function drawCanvas(status, y) {
             break;
         case 3:
             //进入游戏画面（打开幕布）
-            console.log("status3");
-            // if (game.mode === 0) {
-            //     if (pageCurtain.x < game.w / 2) {
-            //         // ctx.clearRect(0, 0, game.w, game.h);
-            //         ctx.fillStyle = "#000";
-            //         ctx.fillRect(0, 0, game.w, game.h);
-
-            //         ctx.drawImage(elemTank, 0, 0, 32, 32, game.w / 2 - 16, game.h / 2 - 16, 32, 32); //中间是p1
-            //         ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, 0, 0, 32, 32); //左上角
-            //         ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, 0, game.h - 32, 32, 32); //左下角
-            //         ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, game.w - 32, 0, 32, 32); //右上角
-            //         ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, game.w - 32, game.h - 32, 32, 32); //右下角
-            //         ctx.fillStyle = "grey";
-            //         pageCurtain.x += 2;
-            //         pageCurtain.y += 2;
-            //         ctx.fillRect(0, 0, game.w, game.h / 2 - pageCurtain.y);
-            //         ctx.fillRect(0, game.h / 2 + pageCurtain.y, game.w, game.h);
-            //     } else {
-            //         //创建坦克对象 让坦克开始动起来
-            //         var p1 = new Tank(game.w / 2 - 16, game.h / 2 - 16, "top", "P1");
-            //         tankList.push(p1);
-            //     }
-            // } else if (game.mode === 1) {
-
-            // }
             crazyKill(mode0Stage);
     }
 }
@@ -152,10 +124,10 @@ var crazyKill = function(stage) {
             ctx.fillRect(0, 0, game.w, game.h);
 
             ctx.drawImage(elemTank, 0, 0, 32, 32, game.w / 2 - 16, game.h / 2 - 16, 32, 32); //中间是p1
-            ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, 0, 0, 32, 32); //左上角
-            ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, 0, game.h - 32, 32, 32); //左下角
-            ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, game.w - 32, 0, 32, 32); //右上角
-            ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, game.w - 32, game.h - 32, 32, 32); //右下角
+            // ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, 0, 0, 32, 32); //左上角
+            // ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, 0, game.h - 32, 32, 32); //左下角
+            // ctx.drawImage(elemTank, calPic(tankPicsNPC.bottom[0]), 0, 32, 32, game.w - 32, 0, 32, 32); //右上角
+            // ctx.drawImage(elemTank, calPic(tankPicsNPC.top[0]), 0, 32, 32, game.w - 32, game.h - 32, 32, 32); //右下角
             ctx.fillStyle = "grey";
             pageCurtain.x += 2;
             pageCurtain.y += 2;
@@ -166,43 +138,93 @@ var crazyKill = function(stage) {
         }
     }
     if (stage === 1) {
-        //创建坦克对象 让坦克开始动起来
+        //创建坦克对象
         var p1 = new Tank(game.w / 2 - 16, game.h / 2 - 16, "top", "P1");
-        tankList.push(p1);
+        var tank = new Tank(0, 0, "bottom", "NPC");
+        tankList.push(p1); //注意p1一定要第一个push进去
+        tankList.push(tank);
         mode0Stage = 2;
     }
     if (stage === 2) {
         // tankList[0].move();
         for (var i = 0; i < tankList.length; i++) {
             var tempTank = tankList[i];
-            ctx.clearRect(tempTank.oldX, tempTank.oldY, 32, 32);
-            if (this.boolAni) {
-                ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][0]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
-                tempTank.boolAni = false;
-            } else {
-                ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][1]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
-                tempTank.boolAni = true;
+            if (tempTank.type === "NPC") {
+                npcDirTimer +=1;
+                if (npcDirTimer===200) {
+                    npcDirTimer =0;
+                    tempTank.dir = randomDir();
+                    // console.log(tempTank.dir);
+                }
+            }
+            if (tempTank.boolKeyDown) {
+                ctx.clearRect(tempTank.oldX, tempTank.oldY, 32, 32);
+                if (tempTank.boolAni) {
+                    ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][0]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
+                    tempTank.boolAni = false;
+                } else {
+                    ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][1]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
+                    tempTank.boolAni = true;
+                }
+                tempTank.move();
             }
         }
     }
+};
+var npcDirTimer = 0;
+function randomDir() {
+    var num = Math.floor((Math.random() * 100) + 1);
+    var dir;
+    if (num <= 25) {
+        dir = "top";
+    } else if (num > 25 && num <= 50) {
+        dir = "bottom";
+    } else if (num > 50 && num <= 75) {
+        dir = "left";
+    } else {
+        dir = "right";
+    }
+    return dir;
 }
-
+var npcBornTimer = 0;
+function createNewNPC() {
+    npcBornTimer += 1；
+    if(npcBornTimer === 100) {
+        var tempTank = randomTank();
+        for (var i = 0; i < tankList.length; i++) {
+            ////////////////////////////////////
+            ///判断在此位置上有没有坦克在走；
+        }
+    }
+}
+function randomTank() {
+    var num = Math.floor((Math.random() * 100) + 1);
+    var tank;
+    if (num <= 25) {
+        tank = new Tank(0, 0, "bottom", "NPC");
+    } else if (num > 25 && num <= 50) {
+        tank = new Tank(0, game.h - 32, "top", "NPC");
+    } else if (num > 50 && num <= 75) {
+        tank = new Tank(game.w - 32, game.h - 32, "top", "NPC");
+    } else {
+        tank = new Tank(game.w - 32, 0, "bottom", "NPC");
+    }
+    return tank;
+}
 /**
  * 坦克
  * @return {[type]} [description]
  */
 function Tank(x, y, dir, type) {
     // var status;
-    this.oldX;
-    this.oldY;
+    this.oldX = x;
+    this.oldY = y;
     this.curX = x; //当前位置
     this.curY = y;
-    this.dir = dir;
-    // var picLocX1 = x1;
-    // var picLocY1 = y1;
-    // var picLocX2 = x2;
-    // var picLocY2 = y2;
-    // var ani = false;
+    this.dir = "top";
+    this.type = type;
+    this.boolKeyDown = this.type === "NPC" ? true : false; //判断方向是否按下
+
     this.speed = type !== "NPC" ? 2 : 1;
     this.pics = (function() {
         if (type === "NPC") return tankPicsNPC;
@@ -211,103 +233,82 @@ function Tank(x, y, dir, type) {
     })();
     this.boolAni = false;
     this.delay = 10;
-    this.moveDist = 8;
-    // this.tireMove = setInterval(function() {
-    //     if (ani) {
-    //         console.log(this.curX);
-    //         ctx.drawImage(elemTank, picLocX1, picLocY1, 32, 32, this.curX, this.curY, 32, 32);
-    //         ani = false;
-    //     } else {
-    //         ctx.drawImage(elemTank, picLocX2, picLocY2, 32, 32, this.curX, this.curY, 32, 32);
-    //         ani = true;
-    //     }
-    // }, 100);
-    // //让坦克动起来
-    // // setInterval(tireMove, 100);
-    // this.setCurX = function(x) {
-    //     curX = x;
-    // };
-    // this.getCurX = function() {
-    //     return curX;
-    // };
-    // this.setCurY = function(y) {
-    //     curY = y;
-    // };
-    // this.getCurY = function() {
-    //     return curY;
-    // };
+    this.moveDist = 2;
 }
 Tank.prototype.fire = function() {
     // body...
 };
-Tank.prototype.blocked = function(dir) {
-    var newX = this.curX;
-    var newY = this.curY;
-    if (dir === "left") {
-        newX += this.moveDist;
-    } else if (dir === "right") {
-        newX -= this.moveDist;
-    } else if (dir === "top") {
-        newY -= this.moveDist;
-    } else if (dir === "bottom") {
-        newY += this.moveDist;
-    }
-    for (var i = 0; i < tankList.length; i++) {
-        var obj = tankList[i];
-        var meet = overlap(newX, newY, obj.curX, obj.curY);
-    }
-};
+// Tank.prototype.blocked = function(dir) {
+//     var newX = this.curX;
+//     var newY = this.curY;
+//     if (dir === "left") {
+//         newX += this.moveDist;
+//     } else if (dir === "right") {
+//         newX -= this.moveDist;
+//     } else if (dir === "top") {
+//         newY -= this.moveDist;
+//     } else if (dir === "bottom") {
+//         newY += this.moveDist;
+//     }
+//     for (var i = 0; i < tankList.length; i++) {
+//         var obj = tankList[i];
+//         var meet = overlap(newX, newY, obj.curX, obj.curY);
+//     }
+// };
 
+function beBlocked(x, y) {
+    //检查某个坦克是否将要被阻挡
+    var b = [];
+    for (var i = 0; i < tankList.length; i++) {
+        if (overlap(x, y, tankList[i].curX, tankList[i].curY)) {
+            b.push(true);
+        }
+    }
+    if (b.length >= 2 || x < 0 || y < 0 || x + 32 > game.w || y + 32 > game.h) {
+        return true;
+    }
+    return false;
+}
 
 function overlap(x1, y1, x2, y2) {
-    if (x2 < x1 && x1 < x2 + 32 && y2 < y1 && y1 < y2 + 32) {
+    if (x1 >= x2 && x1 <= x2 + 32 && y1 >= y2 && y1 <= y2 + 32) {
         return true;
-    } else if (x2 < x1 + 32 && x1 + 32 < x2 + 32 && y2 < y1 && y1 < y2 + 32) {
+    } else if (x1 + 32 >= x2 && x1 + 32 <= x2 + 32 && y1 >= y2 && y1 <= y2 + 32) {
         return true;
-    } else if (x2 < x1 && x1 < x2 + 32 && y2 < y1 + 32 && y1 + 32 < y2 + 32) {
+    } else if (x1 >= x2 && x1 <= x2 + 32 && y1 + 32 >= y2 && y1 + 32 <= y2 + 32) {
         return true;
-    } else if (x2 < x1 + 32 && x1 + 32 < x2 + 32 && y2 < y1 + 32 && y1 + 32 < y2 + 32) {
+    } else if (x1 + 32 >= x2 && x1 + 32 <= x2 + 32 && y1 + 32 >= y2 && y1 + 32 <= y2 + 32) {
         return true;
     }
     return false;
 }
 Tank.prototype.move = function() {
-    // //让坦克有动画效果
-    // ctx.clearRect(this.curX, this.curY, 32, 32);
-    // if (this.boolAni) {
-    //     ctx.drawImage(elemTank, calPic(this.pics[this.dir][0]), 0, 32, 32, this.curX, this.curY, 32, 32);
-    //     this.boolAni = false;
-    // } else {
-    //     ctx.drawImage(elemTank, calPic(this.pics[this.dir][1]), 0, 32, 32, this.curX, this.curY, 32, 32);
-    //     this.boolAni = true;
-    // }
-    //移动坦克
-    console.log("run move");
-    this.oldX = this.curX;
-    this.oldY = this.curY;
-    if (this.delay >= 100) {
-        this.delay = 0;
-        ctx.clearRect(this.curX, this.curY, 32, 32);
-        if (this.dir === "left") {
-            this.curX -= this.moveDist;
-            // ctx.drawImage(elemTank, calPic(this.pics[this.dir][0]), 0, 32, 32, this.curX, this.curY, 32, 32);
-        } else if (this.dir === "right") {
-            this.curX += this.moveDist;
-        } else if (this.dir === "top") {
-            this.curY -= this.moveDist;
-        } else if (this.dir === "bottom") {
-            this.curY += this.moveDist;
+    var tempX = this.curX;
+    var tempY = this.curY;
+    if (this.boolKeyDown) {
+        //移动坦克
+        this.oldX = this.curX;
+        this.oldY = this.curY;
+        if (this.delay >= 100) {
+            this.delay = 0;
+            // ctx.clearRect(this.curX, this.curY, 32, 32);
+            if (this.dir === "left") {
+                tempX -= this.moveDist;
+            } else if (this.dir === "right") {
+                tempX += this.moveDist;
+            } else if (this.dir === "top") {
+                tempY -= this.moveDist;
+            } else if (this.dir === "bottom") {
+                tempY += this.moveDist;
+            }
+            if (!beBlocked(tempX, tempY)) {
+                this.curX = tempX;
+                this.curY = tempY;
+            }
+        } else {
+            this.delay += this.speed * 100;
         }
-
-        // ctx.drawImage(elemTank, this.pic);
-    } else {
-        this.delay += this.speed * 100;
-
     }
-    // ctx.clearRect(this.curX, this.curY, 32, 32);
-    // if (dir === "left") {
-    //     ctx.drawImage()
-    // }
 };
 
 var pageStart = {
@@ -320,7 +321,6 @@ var pageCurtain = {
 var bindKeys = function() {
     window.onkeydown = function(e) {
         var keynum = window.event ? e.keyCode : e.which;
-        console.log(keynum);
         if (game.status === 0) {
             if (keynum === 13) {
                 pageStart.y = 0;
@@ -328,7 +328,6 @@ var bindKeys = function() {
         }
         if (game.status === 1) {
             //动态坦克准备好以后
-            // console.log(keynum);
             if (keynum === 83 || keynum === 40) {
                 game.mode = 1;
             } else if (keynum === 87 || keynum === 38) {
@@ -340,18 +339,32 @@ var bindKeys = function() {
             //进入游戏后
             if (mode0Stage === 2) {
                 if (keynum === 83) {
+                    tankList[0].boolKeyDown = true;
                     tankList[0].dir = "bottom";
                 } else if (keynum === 87) {
+                    tankList[0].boolKeyDown = true;
                     tankList[0].dir = "top";
                 } else if (keynum === 65) {
+                    tankList[0].boolKeyDown = true;
                     tankList[0].dir = "left";
                 } else if (keynum === 68) {
+                    tankList[0].boolKeyDown = true;
                     tankList[0].dir = "right";
                 }
-                tankList[0].move();
+                // tankList[0].move();
             }
         }
     };
+    window.onkeyup = function(e) {
+        var keynum = window.event ? e.keyCode : e.which;
+        if (game.status === 3) {
+            if (mode0Stage === 2) {
+                if (keynum === 83 || keynum === 87 || keynum === 65 || keynum === 68) {
+                    tankList[0].boolKeyDown = false;
+                }
+            }
+        }
+    }
 };
 // var startTank; //开始界面选择游戏模式的坦克
 var setInt = window.setInterval(function() {
@@ -360,10 +373,6 @@ var setInt = window.setInterval(function() {
             drawCanvas(game.status, pageStart.y);
             pageStart.y -= 2;
         } else {
-            // if (startTank === undefined) {
-            //     // console.log("start tank");
-            //     startTank = new Tank(150, 275, 1152, 0, 1728, 0);
-            // }
             game.status = 1;
         }
     } else if (game.status === 1) {
