@@ -30,7 +30,7 @@ var tankSize = {
 var bombSize = {
     w: 64,
     h: 64
-}
+};
 var dirList = ["top", "bottom", "left", "right"];
 var tankPicsNPC = {
     'top': [9, 27],
@@ -47,8 +47,8 @@ var tankPicsP1 = {
 var tankPicsP2 = {
     'top': [5, 23],
     'bottom': [77, 95],
-    'left': [41, 59],
-    'right': [113, 131]
+    'left': [113, 131],
+    'right': [41, 59]
 };
 var bulletPics = {
     'top': [0, 0],
@@ -56,7 +56,21 @@ var bulletPics = {
     'bottom': [16, 0],
     'left': [24, 0]
 };
-
+var bulletSize = {
+    w: 8,
+    h: 8
+};
+var boomSize = {
+    w: 64,
+    h: 64
+};
+var pageStart = {
+    y: 488
+};
+var pageCurtain = {
+    x: 0,
+    y: 0
+};
 var calPic = function(num) {
     //根据坦克所在位置来计算像素开始的位置
     return (num - 1) * 32;
@@ -68,6 +82,12 @@ var gameMode = {
 var boolTankAni = false; //让选择画面的坦克动起来
 var tankList = [];
 var bulletList = [];
+var bombList = [];
+
+var npcDirTimer = 0;
+var npcBornTimer = 0;
+var tankLicense = 0; //新产生一个坦克就+1
+
 /**
  * 渲染画布，不同阶段对应不同画面
  * @param {Num} status {0,1,2}
@@ -127,15 +147,76 @@ function drawCanvas(status, y) {
         case 3:
             //进入游戏画面（打开幕布）
             if (game.mode === 0) crazyKill(mode0Stage);
-            if (game.mode === 1) civilWar(mode1Stage);
+            if (game.mode === 1) fightClub(mode1Stage);
 
     }
 }
 var mode1Stage = 0;
-var civilWar = function(stage) {
-    ctx.fillStyle = "red";
-    ctx.fillRect(0, 0, game.w, game.h);
-}
+var mode1StageStop = 3;
+var fightClub = function(stage) {
+    if (stage === 0) {
+        if (pageCurtain.x < game.w / 2) {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, game.w, game.h);
+            ctx.drawImage(elemTank, (tankPicsP1["right"][0]-1)*tankSize.w, 0, tankSize.w, tankSize.h, 0, (game.h - tankSize.h) / 2, tankSize.w, tankSize.h);
+            ctx.drawImage(elemTank, (tankPicsP2["left"][0]-1)*tankSize.w, 0, tankSize.w, tankSize.h, game.w - tankSize.w, (game.h - tankSize.h) / 2, tankSize.w, tankSize.h);
+            ctx.fillStyle = "grey";
+            pageCurtain.x += 2;
+            pageCurtain.y += 2;
+            ctx.fillRect(0, 0, game.w, game.h / 2 - pageCurtain.y);
+            ctx.fillRect(0, game.h / 2 + pageCurtain.y, game.w, game.h);
+        } else {
+            mode1Stage = 1;
+        }
+    }
+    if (stage === 1) {
+        var p1 = new Tank(0, (game.h - tankSize.h) / 2, "bottom", "P1");
+        var p2 = new Tank(game.w - tankSize.w, (game.h - tankSize.h) / 2, "top", "P2");
+        tankList.push(p1, p2);
+        mode1Stage = 2;
+    }
+    if (stage === 2) {
+        killBullet();
+        for (var i = bulletList.length - 1; i >= 0; i--) {
+            bulletList[i].fly();
+            //如果子弹超出范围，从列表中消除
+            if (bulletList[i].curX < 0 || bulletList[i].curX > game.w || bulletList[i].curY < 0 || bulletList[i].curY > game.h) {
+                ctx.clearRect(bulletList[i].curX, bulletList[i].curY, bulletSize.w, bulletSize.h);
+                bulletList.splice(i, 1);
+            }
+        }
+        killTank();
+        for (var i = bombList.length - 1; i >= 0; i--) {
+            bombList[i].showExplode();
+            if (bombList[i].times < 0) {
+                bombList.splice(i, 1);
+            }
+        }
+        for (var i = 0; i < tankList.length; i++) {
+            if (i === 0) {
+                if (tankList.length < 2) {
+                    mode1StageStop -= 1;
+                    if (mode1StageStop === 0) {
+                        clearInterval(setInt);
+                    }
+                }
+            }
+            var tempTank = tankList[i];
+            //随机选择NPC的方向
+            if (tempTank.boolKeyDown) {
+                ctx.clearRect(tempTank.oldX, tempTank.oldY, 32, 32);
+                if (tempTank.boolAni) {
+                    ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][0]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
+                    tempTank.boolAni = false;
+                } else {
+                    ctx.drawImage(elemTank, calPic(tempTank.pics[tempTank.dir][1]), 0, 32, 32, tempTank.curX, tempTank.curY, 32, 32);
+                    tempTank.boolAni = true;
+                }
+                tempTank.move();
+            }
+        }
+    }
+};
 var mode0Stage = 0;
 var mode0StageStop = 3;
 var crazyKill = function(stage) {
@@ -221,7 +302,7 @@ var crazyKill = function(stage) {
         }
     }
 };
-var npcDirTimer = 0;
+
 
 function randomDir() {
     var num = Math.floor((Math.random() * 100) + 1);
@@ -237,7 +318,6 @@ function randomDir() {
     }
     return dir;
 }
-var npcBornTimer = 0;
 
 function createNewNPC(maxNum) {
     if (tankList.length <= maxNum) {
@@ -275,7 +355,6 @@ function randomTank() {
     }
     return tempTank;
 }
-var tankLicense = 0; //新产生一个坦克就+1
 /**
  * 坦克
  * @return {[type]} [description]
@@ -402,15 +481,7 @@ Bullet.prototype.fly = function() {
     ctx.clearRect(this.oldX, this.oldY, bulletSize.w, bulletSize.h);
     ctx.drawImage(elemMisc, this.pic[0], this.pic[1], bulletSize.w, bulletSize.h, this.curX, this.curY, bulletSize.w, bulletSize.h);
 };
-var bulletSize = {
-    w: 8,
-    h: 8
-};
-var boomSize = {
-    w: 64,
-    h: 64
-};
-var bombList = [];
+
 
 function killTank() {
     for (var i = bulletList.length - 1; i >= 0; i--) {
@@ -516,17 +587,11 @@ function overlap(x1, y1, l1, x2, y2, l2) {
 }
 
 
-var pageStart = {
-    y: 488
-};
-var pageCurtain = {
-    x: 0,
-    y: 0
-};
+
 var bindKeys = function() {
     window.onkeydown = function(e) {
         var keynum = window.event ? e.keyCode : e.which;
-        console.log(keynum);
+        // console.log(keynum);
         if (game.status === 0) {
             if (keynum === 13) {
                 pageStart.y = 0;
@@ -543,7 +608,7 @@ var bindKeys = function() {
             }
         } else if (game.status === 3) {
             //进入游戏后
-            if (mode0Stage === 2) {
+            if (game.mode === 0 && mode0Stage === 2 && tankList.length > 0) {
                 if (keynum === 83) {
                     tankList[0].boolKeyDown = true;
                     tankList[0].dir = "bottom";
@@ -558,20 +623,61 @@ var bindKeys = function() {
                     tankList[0].dir = "right";
                 }
                 if (keynum === 72) {
-                    if (tankList.length > 0) {
-                        if (game.mode === 0) {
-                            tankList[0].fire();
-                        }
-                    }
+                    tankList[0].fire();
                 }
                 // tankList[0].move();
             }
+            if (game.mode === 1 && mode1Stage === 2 && tankList.length > 1) {
+                if (keynum === 83) {
+                    tankList[0].boolKeyDown = true;
+                    tankList[0].dir = "bottom";
+                } else if (keynum === 87) {
+                    tankList[0].boolKeyDown = true;
+                    tankList[0].dir = "top";
+                } else if (keynum === 65) {
+                    tankList[0].boolKeyDown = true;
+                    tankList[0].dir = "left";
+                } else if (keynum === 68) {
+                    tankList[0].boolKeyDown = true;
+                    tankList[0].dir = "right";
+                }
+                if (keynum === 72) {
+                    tankList[0].fire();
+                }
+
+                if (keynum === 38) {
+                    tankList[1].boolKeyDown = true;
+                    tankList[1].dir = "top";
+                } else if (keynum === 40) {
+                    tankList[1].boolKeyDown = true;
+                    tankList[1].dir = "bottom";
+                } else if (keynum === 37) {
+                    tankList[1].boolKeyDown = true;
+                    tankList[1].dir = "left";
+                } else if (keynum === 39) {
+                    tankList[1].boolKeyDown = true;
+                    tankList[1].dir = "right";
+                }
+                if (keynum === 190) {
+                    tankList[1].fire();
+                }
+            }
+
         }
     };
     window.onkeyup = function(e) {
         var keynum = window.event ? e.keyCode : e.which;
         if (game.status === 3) {
-            if (mode0Stage === 2) {
+            if (game.mode === 0 && mode0Stage === 2) {
+                if (keynum === 83 || keynum === 87 || keynum === 65 || keynum === 68) {
+                    tankList[0].boolKeyDown = false;
+                }
+            }
+            if (game.mode === 1 && mode1Stage === 2) {
+                // console.log("boolkeyDown: "+tankList[1].boolKeyDown);
+                if (keynum === 37 || keynum === 38 || keynum === 39 || keynum === 40) {
+                    tankList[1].boolKeyDown = false;
+                }
                 if (keynum === 83 || keynum === 87 || keynum === 65 || keynum === 68) {
                     tankList[0].boolKeyDown = false;
                 }
